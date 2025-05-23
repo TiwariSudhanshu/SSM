@@ -6,6 +6,7 @@ import {
   BankOutlined,
   LineChartOutlined,
   LogoutOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -30,10 +31,15 @@ const AdminLayout = () => {
       icon: <UserOutlined />,
       label: <Link to="/admin/users">Users</Link>,
     },
+    // {
+    //   key: '/admin/shares',
+    //   icon: <LineChartOutlined />,
+    //   label: <Link to="/admin/shares">Share Management</Link>,
+    // },
     {
-      key: '/admin/shares',
-      icon: <LineChartOutlined />,
-      label: <Link to="/admin/shares">Share Management</Link>,
+      key: '/admin/rounds',
+      icon: <PlayCircleOutlined />,
+      label: <Link to="/admin/rounds">Round Management</Link>,
     },
   ];
 

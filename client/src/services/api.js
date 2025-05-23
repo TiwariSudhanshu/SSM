@@ -24,6 +24,27 @@ api.interceptors.request.use(
     }
 );
 
+// Add a response interceptor to handle errors
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('API Error:', error.response.data);
+            return Promise.reject(error.response.data);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+            return Promise.reject({ message: 'No response from server' });
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Request setup error:', error.message);
+            return Promise.reject({ message: 'Failed to make request' });
+        }
+    }
+);
+
 export const register = async (name, email, password) => {
     const response = await api.post('/auth/register', { name, email, password });
     return response.data;
@@ -40,13 +61,23 @@ export const getPortfolio = async () => {
 };
 
 export const getCompanies = async () => {
-    const response = await api.get('/dashboard/companies');
-    return response.data;
+    try {
+        const response = await api.get('/admin/companies');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching companies:', error);
+        throw error;
+    }
 };
 
 export const executeTrade = async (tradeData) => {
-    const response = await api.post('/trade/execute', tradeData);
-    return response.data;
+    try {
+        const response = await api.post('/trade/execute', tradeData);
+        return response.data;
+    } catch (error) {
+        console.error('Error executing trade:', error);
+        throw error;
+    }
 };
 
 export default api; 

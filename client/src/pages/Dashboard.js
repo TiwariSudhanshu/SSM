@@ -80,11 +80,33 @@ const Dashboard = () => {
             Portfolio Summary
           </Typography>
           <Typography>
-            Total Value: ${portfolio?.portfolioValue.toFixed(2)}
+            Total Value: ${portfolio?.portfolioValue?.toFixed(2)}
           </Typography>
           <Typography>
             ESG Score: {portfolio?.esgScore}
           </Typography>
+          <Typography>
+            Average ESG Score: {portfolio?.avgESGScore?.toFixed(2)}
+          </Typography>
+          <Typography>
+            Normalized Value: {portfolio?.normalizedValue?.toFixed(2)}
+          </Typography>
+          <Typography>
+            Sector Score: {portfolio?.sectorScore?.toFixed(2)}
+          </Typography>
+          <Typography>
+            Final Score: {portfolio?.finalScore?.toFixed(2)}
+          </Typography>
+          {portfolio?.sectorDistribution && (
+            <Box mt={2}>
+              <Typography variant="subtitle1">Sector Distribution:</Typography>
+              <ul>
+                {Object.entries(portfolio.sectorDistribution).map(([sector, shares]) => (
+                  <li key={sector}>{sector}: {shares} shares</li>
+                ))}
+              </ul>
+            </Box>
+          )}
         </Paper>
       </Grid>
 

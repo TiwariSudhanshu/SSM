@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Company = require('../models/Company');
 const User = require('../models/User');
+const Round = require('../models/Round');
+const { getIO } = require('../socket');
+const { calculatePortfolioMetrics } = require('../utils/scoreCalculations');
 
 // Get all companies
 router.get('/companies', async (req, res) => {
@@ -129,6 +132,133 @@ router.put('/companies/:id/price', async (req, res) => {
   } catch (error) {
     console.error('Error updating price:', error);
     res.status(500).json({ message: 'Failed to update price' });
+  }
+});
+
+// Get current round
+router.get('/rounds/current', async (req, res) => {
+  try {
+    const currentRound = await Round.findOne({ isActive: true });
+    res.json(currentRound);
+  } catch (error) {
+    console.error('Error fetching current round:', error);
+    res.status(500).json({ message: 'Failed to fetch current round' });
+  }
+});
+
+// Start new round
+router.post('/rounds/start', async (req, res) => {
+  try {
+    const { duration } = req.body;
+    const io = getIO();
+
+    // Check if there's already an active round
+    const activeRound = await Round.findOne({ isActive: true });
+    if (activeRound) {
+      return res.status(400).json({ message: 'There is already an active round' });
+    }
+
+    // Get the last round number
+    const lastRound = await Round.findOne().sort({ roundNumber: -1 });
+    const roundNumber = lastRound ? lastRound.roundNumber + 1 : 1;
+
+    // Create new round
+    const startTime = new Date();
+    const endTime = new Date(startTime.getTime() + duration * 60000); // Convert minutes to milliseconds
+
+    const round = new Round({
+      startTime,
+      endTime,
+      isActive: true,
+      roundNumber
+    });
+
+    await round.save();
+
+    // Notify all clients about the new round
+    io.emit('roundUpdate', {
+      type: 'start',
+      round: round
+    });
+
+    res.status(201).json(round);
+  } catch (error) {
+    console.error('Error starting round:', error);
+    res.status(500).json({ message: 'Failed to start round' });
+  }
+});
+
+// End current round
+router.post('/rounds/end', async (req, res) => {
+  try {
+    const io = getIO();
+    const currentRound = await Round.findOne({ isActive: true });
+
+    if (!currentRound) {
+      return res.status(400).json({ message: 'No active round found' });
+    }
+
+    // Get all companies and users for calculations
+    const [companies, users] = await Promise.all([
+      Company.find(),
+      User.find()
+    ]);
+
+    // Calculate metrics for each user
+    const userMetrics = users.map(user => {
+      const metrics = calculatePortfolioMetrics(user, companies, users);
+      
+      // Update user with new metrics using findByIdAndUpdate to avoid password validation
+      return User.findByIdAndUpdate(
+        user._id,
+        {
+          portfolioValue: metrics.portfolioValue,
+          avgESGScore: metrics.avgESGScore,
+          normalizedValue: metrics.normalizedValue,
+          sectorScore: metrics.sectorScore,
+          finalScore: metrics.finalScore,
+          sectorDistribution: metrics.sectorDistribution
+        },
+        { new: true }
+      );
+    });
+
+    await Promise.all(userMetrics);
+
+    // End the round
+    currentRound.isActive = false;
+    await currentRound.save();
+
+    // Notify all clients about the round end and new metrics
+    io.emit('roundUpdate', {
+      type: 'end',
+      round: currentRound,
+      metrics: users.map(user => ({
+        userId: user._id,
+        portfolioValue: user.portfolioValue,
+        avgESGScore: user.avgESGScore,
+        normalizedValue: user.normalizedValue,
+        sectorScore: user.sectorScore,
+        finalScore: user.finalScore,
+        sectorDistribution: user.sectorDistribution
+      }))
+    });
+
+    res.json({
+      round: currentRound,
+      metrics: users.map(user => ({
+        userId: user._id,
+        portfolioValue: user.portfolioValue,
+        avgESGScore: user.avgESGScore,
+        normalizedValue: user.normalizedValue,
+        sectorScore: user.sectorScore,
+        finalScore: user.finalScore,
+        sectorDistribution: user.sectorDistribution
+      }))
+    });
+  } catch (error) {
+    console.error('Error ending round:', error);
+    res.status(500).json({ message: 'Failed to end round' });
   }
 });
 

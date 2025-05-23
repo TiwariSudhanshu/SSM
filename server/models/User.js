@@ -23,6 +23,26 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    finalScore: {
+        type: Number,
+        default: 0
+    },
+    normalizedValue: {
+        type: Number,
+        default: 0
+    },
+    sectorScore: {
+        type: Number,
+        default: 0
+    },
+    avgESGScore: {
+        type: Number,
+        default: 0
+    },
+    sectorDistribution: {
+        type: Object,
+        default: {}
+    },
     holdings: [{
         company: {
             type: mongoose.Schema.Types.ObjectId,

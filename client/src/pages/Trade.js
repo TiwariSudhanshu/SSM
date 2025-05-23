@@ -26,23 +26,31 @@ const Trade = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getCompanies();
-        setCompanies(data);
+        const companiesData = await getCompanies();
+        
+        // Ensure we have valid data
+        if (Array.isArray(companiesData)) {
+          setCompanies(companiesData);
+        } else {
+          console.error('Invalid companies data:', companiesData);
+          setError('Failed to load companies');
+        }
       } catch (err) {
-        setError('Failed to fetch companies');
+        console.error('Error fetching data:', err);
+        setError('Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCompanies();
+    fetchData();
 
     // Socket.IO listeners for real-time updates
     socketService.connect();
     socketService.onCompanyUpdate(() => {
-      fetchCompanies();
+      fetchData();
     });
 
     return () => {
@@ -65,7 +73,7 @@ const Trade = () => {
       setSelectedCompany('');
       setShares('');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to execute trade');
+      setError(err.message || 'Failed to execute trade');
     }
   };
 

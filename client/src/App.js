@@ -13,6 +13,7 @@ import Trade from './pages/Trade';
 import AdminLayout from './pages/Admin/AdminLayout';
 import Companies from './pages/Admin/Companies';
 import Users from './pages/Admin/Users';
+import Rounds from './pages/Admin/Rounds';
 import AdminLogin from './pages/Admin/AdminLogin';
 
 const theme = createTheme({
@@ -65,6 +66,7 @@ function App() {
               >
                 <Route path="companies" element={<Companies />} />
                 <Route path="users" element={<Users />} />
+                <Route path="rounds" element={<Rounds />} />
                 <Route index element={<Navigate to="companies" />} />
               </Route>
               <Route path="/" element={<Navigate to="/dashboard" />} />
