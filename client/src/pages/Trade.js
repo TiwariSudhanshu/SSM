@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { getCompanies, executeTrade } from '../services/api';
-import socketService from '../services/socket';
+import SocketService from '../services/socket';
 
 const Trade = () => {
   const [companies, setCompanies] = useState([]);
@@ -48,13 +48,13 @@ const Trade = () => {
     fetchData();
 
     // Socket.IO listeners for real-time updates
-    socketService.connect();
-    socketService.onCompanyUpdate(() => {
+    SocketService.connect();
+    SocketService.onCompanyUpdate(() => {
       fetchData();
     });
 
     return () => {
-      socketService.disconnect();
+      SocketService.disconnect();
     };
   }, []);
 

@@ -13,7 +13,7 @@ import {
   Box,
 } from '@mui/material';
 import { getPortfolio, getCompanies } from '../services/api';
-import socketService from '../services/socket';
+import SocketService from '../services/socket';
 
 const Dashboard = () => {
   const [portfolio, setPortfolio] = useState(null);
@@ -40,18 +40,28 @@ const Dashboard = () => {
     fetchData();
 
     // Socket.IO listeners
-    socketService.connect();
-    socketService.onTradeUpdate((data) => {
+    console.log('Attempting to connect socket...');
+
+    
+    try {
+      SocketService.connect();
+    } catch (error) {
+      console.error('Socket connection failed:', error);
+      setError('Socket connection failed');
+      return;
+      
+    }
+    SocketService.onTradeUpdate((data) => {
       if (data.userId === portfolio?._id) {
         fetchData();
       }
     });
-    socketService.onCompanyUpdate(() => {
+    SocketService.onCompanyUpdate(() => {
       fetchData();
     });
 
     return () => {
-      socketService.disconnect();
+      SocketService.disconnect();
     };
   }, []);
 
