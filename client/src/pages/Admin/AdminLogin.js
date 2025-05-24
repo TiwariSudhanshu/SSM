@@ -23,7 +23,7 @@ const AdminLogin = () => {
     if (values.passkey === 'ecellrgpv@123') {
       localStorage.setItem('isAdmin', 'true');
       message.success('Welcome Admin!');
-      navigate('/admin');
+      window.location.href = '/admin';  // Using window.location for hard redirect
     } else {
       message.error('Invalid passkey');
     }

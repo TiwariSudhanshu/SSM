@@ -101,9 +101,14 @@ const Login = () => {
     try {
       const response = await login(formData.email, formData.password)
       localStorage.setItem("token", response.token)
-      navigate("/dashboard")
+      if (response.isAdmin) {
+        localStorage.setItem("isAdmin", "true")
+        window.location.href = "/admin"
+      } else {
+        window.location.href = "/dashboard"
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed")
+      setError(err.message || "Login failed")
     }
   }
 

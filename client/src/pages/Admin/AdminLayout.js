@@ -17,7 +17,8 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('isAdmin');
-    navigate('/admin-login');
+    localStorage.removeItem('token');
+    window.location.href = '/admin-login';
   };
 
   const menuItems = [

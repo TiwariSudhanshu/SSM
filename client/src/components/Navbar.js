@@ -3,14 +3,26 @@
 import { useNavigate } from "react-router-dom"
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material"
 import { Leaf } from "lucide-react"
+import React from "react"
 
 const Navbar = () => {
   const navigate = useNavigate()
-  const isAuthenticated = !!localStorage.getItem("token")
+  const [isAuthenticated, setIsAuthenticated] = React.useState(!!localStorage.getItem("token"))
+
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token")
-    navigate("/login")
+    localStorage.removeItem("isAdmin")
+    setIsAuthenticated(false)
+    navigate("/login", { replace: true })
   }
 
   return (
@@ -65,7 +77,7 @@ const Navbar = () => {
           </Typography>
         </Box>
 
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <Box
             sx={{
               display: "flex",
@@ -116,19 +128,17 @@ const Navbar = () => {
             <Button
               onClick={handleLogout}
               sx={{
-                background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-                color: "white",
+                color: "#374151",
                 fontWeight: 600,
                 fontSize: { xs: "0.875rem", sm: "1rem" },
                 textTransform: "none",
                 px: { xs: 2, sm: 3 },
                 py: 1,
                 borderRadius: "10px",
-                boxShadow: "0 4px 12px rgba(34, 197, 94, 0.3)",
                 transition: "all 0.2s ease-in-out",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
-                  boxShadow: "0 6px 16px rgba(34, 197, 94, 0.4)",
+                  backgroundColor: "#f0fdf4",
+                  color: "#22c55e",
                   transform: "translateY(-1px)",
                 },
               }}
@@ -136,29 +146,6 @@ const Navbar = () => {
               Logout
             </Button>
           </Box>
-        ) : (
-          <Button
-            onClick={() => navigate("/login")}
-            sx={{
-              background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-              color: "white",
-              fontWeight: 600,
-              fontSize: { xs: "0.875rem", sm: "1rem" },
-              textTransform: "none",
-              px: { xs: 2, sm: 3 },
-              py: 1,
-              borderRadius: "10px",
-              boxShadow: "0 4px 12px rgba(34, 197, 94, 0.3)",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
-                boxShadow: "0 6px 16px rgba(34, 197, 94, 0.4)",
-                transform: "translateY(-1px)",
-              },
-            }}
-          >
-            Login
-          </Button>
         )}
       </Toolbar>
     </AppBar>

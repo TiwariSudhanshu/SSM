@@ -6,6 +6,7 @@ import { Box, Container } from '@mui/material';
 
 // Components
 import Navbar from './components/Navbar';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -80,8 +81,19 @@ const theme = createTheme({
 
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem('token');
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const [isAuthenticated, setIsAuthenticated] = React.useState(!!localStorage.getItem('token'));
+  const [isAdmin, setIsAdmin] = React.useState(localStorage.getItem('isAdmin') === 'true');
+
+  // Listen for storage changes
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem('token'));
+      setIsAdmin(localStorage.getItem('isAdmin') === 'true');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -91,36 +103,36 @@ function App() {
           <Navbar />
           <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
             <Routes>
+              <Route path="/" element={<Home />} />
               <Route 
                 path="/login" 
-                element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
+                element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
               />
               <Route 
                 path="/register" 
-                element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
+                element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" replace />} 
               />
               <Route 
                 path="/dashboard" 
-                element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+                element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} 
               />
               <Route 
                 path="/trade" 
-                element={isAuthenticated ? <Trade /> : <Navigate to="/login" />} 
+                element={isAuthenticated ? <Trade /> : <Navigate to="/login" replace />} 
               />
               <Route 
                 path="/admin-login" 
-                element={!isAdmin ? <AdminLogin /> : <Navigate to="/admin" />} 
+                element={!isAdmin ? <AdminLogin /> : <Navigate to="/admin" replace />} 
               />
               <Route 
                 path="/admin" 
-                element={isAdmin ? <AdminLayout /> : <Navigate to="/admin-login" />}
+                element={isAdmin ? <AdminLayout /> : <Navigate to="/admin-login" replace />}
               >
                 <Route path="companies" element={<Companies />} />
                 <Route path="users" element={<Users />} />
                 <Route path="rounds" element={<Rounds />} />
-                <Route index element={<Navigate to="companies" />} />
+                <Route index element={<Navigate to="companies" replace />} />
               </Route>
-              <Route path="/" element={<Navigate to="/dashboard" />} />
             </Routes>
           </Container>
         </Box>

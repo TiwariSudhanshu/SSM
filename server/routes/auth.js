@@ -75,6 +75,7 @@ router.post('/login', async (req, res) => {
             email: user.email,
             portfolioValue: user.portfolioValue,
             esgScore: user.esgScore,
+            isAdmin: user.isAdmin,
             token
         });
     } catch (error) {
