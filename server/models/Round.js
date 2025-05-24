@@ -16,6 +16,10 @@ const roundSchema = new mongoose.Schema({
     roundNumber: {
         type: Number,
         required: true
+    },
+    tradeEnabled: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

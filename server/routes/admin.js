@@ -170,10 +170,28 @@ router.post('/rounds/start', async (req, res) => {
       startTime,
       endTime,
       isActive: true,
-      roundNumber
+      roundNumber,
+      tradeEnabled: true
     });
 
     await round.save();
+
+    // Set up automatic round ending
+    const timeUntilEnd = endTime - startTime;
+    setTimeout(async () => {
+      const currentRound = await Round.findOne({ _id: round._id, isActive: true });
+      if (currentRound) {
+        currentRound.isActive = false;
+        currentRound.tradeEnabled = false;
+        await currentRound.save();
+
+        // Notify all clients about the round end
+        io.emit('roundUpdate', {
+          type: 'end',
+          round: currentRound
+        });
+      }
+    }, timeUntilEnd);
 
     // Notify all clients about the new round
     io.emit('roundUpdate', {
@@ -208,7 +226,6 @@ router.post('/rounds/end', async (req, res) => {
     const userMetrics = users.map(user => {
       const metrics = calculatePortfolioMetrics(user, companies, users);
       
-      // Update user with new metrics using findByIdAndUpdate to avoid password validation
       return User.findByIdAndUpdate(
         user._id,
         {
@@ -225,8 +242,9 @@ router.post('/rounds/end', async (req, res) => {
 
     await Promise.all(userMetrics);
 
-    // End the round
+    // End the round and disable trading
     currentRound.isActive = false;
+    currentRound.tradeEnabled = false;
     await currentRound.save();
 
     // Notify all clients about the round end and new metrics
@@ -259,6 +277,21 @@ router.post('/rounds/end', async (req, res) => {
   } catch (error) {
     console.error('Error ending round:', error);
     res.status(500).json({ message: 'Failed to end round' });
+  }
+});
+
+// Get current round status
+router.get('/rounds/status', async (req, res) => {
+  try {
+    const currentRound = await Round.findOne({ isActive: true });
+    res.json({
+      isActive: !!currentRound,
+      tradeEnabled: currentRound?.tradeEnabled || false,
+      round: currentRound
+    });
+  } catch (error) {
+    console.error('Error fetching round status:', error);
+    res.status(500).json({ message: 'Failed to fetch round status' });
   }
 });
 
