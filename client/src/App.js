@@ -18,15 +18,66 @@ import AdminLogin from './pages/Admin/AdminLogin';
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
+    background: {
+      default: '#fdfdf4', // soft cream background
+      paper: '#ffffff',   // white cards
+    },
     primary: {
-      main: '#90caf9',
+      main: '#4CAF50', // green accent (for buttons, headings)
+      contrastText: '#ffffff',
     },
     secondary: {
-      main: '#f48fb1',
+      main: '#81C784', // lighter green for hover/effects
+    },
+    text: {
+      primary: '#2E7D32', // dark green for headings
+      secondary: '#666666', // grey for labels/descriptions
+    },
+  },
+  typography: {
+    fontFamily: `'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif`,
+    h5: {
+      fontWeight: 600,
+      color: '#2E7D32',
+    },
+    button: {
+      textTransform: 'none',
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          boxShadow: '0 4px 10px rgba(76, 175, 80, 0.2)',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          border: '1px solid #C8E6C9',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+            '&.Mui-focused fieldset': {
+              borderColor: '#4CAF50',
+            },
+          },
+        },
+      },
     },
   },
 });
+
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('token');
