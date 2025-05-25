@@ -14,6 +14,8 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Chip,
+  Divider,
 } from "@mui/material"
 import { getCompanies, executeTrade } from "../services/api"
 import SocketService from "../services/socket"
@@ -340,6 +342,7 @@ const Trade = () => {
                 ...paperStyle,
                 border: "1px solid #e8f5e8",
                 boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+                minHeight: "500px",
               }}
             >
               <Typography
@@ -347,7 +350,7 @@ const Trade = () => {
                 sx={{
                   ...headingStyle,
                   fontSize: "1.25rem",
-                  mb: 2,
+                  mb: 3,
                 }}
               >
                 Company Details
@@ -358,39 +361,254 @@ const Trade = () => {
                   {companies
                     .filter((company) => company._id === selectedCompany)
                     .map((company) => (
-                      <Box key={company._id} sx={{ "& > *": { mb: 1.5 } }}>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Name:</strong> {company.name}
-                        </Typography>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Sector:</strong> {company.sector}
-                        </Typography>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Stock Price:</strong> ₹{company.stockPrice}
-                        </Typography>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Available Shares:</strong> {company.availableShares}
-                        </Typography>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>ESG Score:</strong> {company.esgScore}
-                        </Typography>
-                        <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Description:</strong> {company.description}
-                        </Typography>
+                      <Box key={company._id}>
+                        {/* Company Header */}
+                        <Box sx={{ mb: 4 }}>
+                          <Typography 
+                            variant="h5" 
+                            sx={{ 
+                              color: "#2d5016", 
+                              fontWeight: 700,
+                              mb: 1,
+                              fontSize: "1.5rem"
+                            }}
+                          >
+                            {company.name}
+                          </Typography>
+                          <Chip 
+                            label={company.sector}
+                            sx={{
+                              backgroundColor: "#f0fdf4",
+                              color: "#16a34a",
+                              fontWeight: 600,
+                              border: "1px solid #bbf7d0",
+                              borderRadius: "8px",
+                              fontSize: "0.8rem"
+                            }}
+                          />
+                        </Box>
+
+                        <Divider sx={{ mb: 3, borderColor: "#e8f5e8" }} />
+
+                        {/* Key Metrics */}
+                        <Box sx={{ mb: 4 }}>
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              color: "#2d5016", 
+                              fontWeight: 600,
+                              mb: 2.5,
+                              fontSize: "1.1rem"
+                            }}
+                          >
+                            Key Metrics
+                          </Typography>
+                          
+                          <Grid container spacing={2.5}>
+                            <Grid item xs={6}>
+                              <Paper 
+                                elevation={0}
+                                sx={{
+                                  p: 2,
+                                  backgroundColor: "#f8fffe",
+                                  border: "1px solid #d1fae5",
+                                  borderRadius: "12px",
+                                  textAlign: "center"
+                                }}
+                              >
+                                <Typography 
+                                  sx={{ 
+                                    color: "#6b7280", 
+                                    fontSize: "0.8rem",
+                                    fontWeight: 500,
+                                    mb: 0.5
+                                  }}
+                                >
+                                  Stock Price
+                                </Typography>
+                                <Typography 
+                                  sx={{ 
+                                    color: "#16a34a", 
+                                    fontSize: "1.25rem",
+                                    fontWeight: 700
+                                  }}
+                                >
+                                  ₹{company.stockPrice}
+                                </Typography>
+                              </Paper>
+                            </Grid>
+                            
+                            <Grid item xs={6}>
+                              <Paper 
+                                elevation={0}
+                                sx={{
+                                  p: 2,
+                                  backgroundColor: "#f8fffe",
+                                  border: "1px solid #d1fae5",
+                                  borderRadius: "12px",
+                                  textAlign: "center"
+                                }}
+                              >
+                                <Typography 
+                                  sx={{ 
+                                    color: "#6b7280", 
+                                    fontSize: "0.8rem",
+                                    fontWeight: 500,
+                                    mb: 0.5
+                                  }}
+                                >
+                                  ESG Score
+                                </Typography>
+                                <Typography 
+                                  sx={{ 
+                                    color: "#16a34a", 
+                                    fontSize: "1.25rem",
+                                    fontWeight: 700
+                                  }}
+                                >
+                                  {company.esgScore}
+                                </Typography>
+                              </Paper>
+                            </Grid>
+                          </Grid>
+                        </Box>
+
+                        {/* Additional Information */}
+                        <Box sx={{ mb: 4 }}>
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              color: "#2d5016", 
+                              fontWeight: 600,
+                              mb: 2.5,
+                              fontSize: "1.1rem"
+                            }}
+                          >
+                            Additional Information
+                          </Typography>
+                          
+                          <Box 
+                            sx={{ 
+                              p: 2.5,
+                              backgroundColor: "#fafafa",
+                              border: "1px solid #e5e7eb",
+                              borderRadius: "12px",
+                              mb: 2
+                            }}
+                          >
+                            <Typography 
+                              sx={{ 
+                                color: "#6b7280", 
+                                fontSize: "0.8rem",
+                                fontWeight: 500,
+                                mb: 0.5,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px"
+                              }}
+                            >
+                              Available Shares
+                            </Typography>
+                            <Typography 
+                              sx={{ 
+                                color: "#374151", 
+                                fontSize: "1.1rem",
+                                fontWeight: 600
+                              }}
+                            >
+                              {company.availableShares?.toLocaleString() || 'N/A'}
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Company Description */}
+                        <Box>
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              color: "#2d5016", 
+                              fontWeight: 600,
+                              mb: 2,
+                              fontSize: "1.1rem"
+                            }}
+                          >
+                            About Company
+                          </Typography>
+                          
+                          <Box 
+                            sx={{ 
+                              p: 2.5,
+                              backgroundColor: "#f9fafb",
+                              border: "1px solid #e5e7eb",
+                              borderRadius: "12px"
+                            }}
+                          >
+                            <Typography 
+                              sx={{ 
+                                color: "#4b5563", 
+                                fontSize: "0.95rem",
+                                lineHeight: 1.6,
+                                fontWeight: 400
+                              }}
+                            >
+                              {company.description || 'No description available.'}
+                            </Typography>
+                          </Box>
+                        </Box>
                       </Box>
                     ))}
                 </>
               ) : (
-                <Typography
+                <Box 
                   sx={{
-                    color: "#6b7280",
-                    fontStyle: "italic",
-                    textAlign: "center",
-                    py: 4,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "400px",
+                    textAlign: "center"
                   }}
                 >
-                  Select a company to view details
-                </Typography>
+                  <Box 
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      backgroundColor: "#f3f4f6",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mb: 2
+                    }}
+                  >
+                    <Typography 
+                      sx={{ 
+                        fontSize: "2rem",
+                        color: "#9ca3af"
+                      }}
+                    >
+                      📊
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      color: "#6b7280",
+                      fontWeight: 500,
+                      fontSize: "1.1rem",
+                      mb: 1
+                    }}
+                  >
+                    No Company Selected
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "#9ca3af",
+                      fontSize: "0.9rem",
+                      maxWidth: "280px"
+                    }}
+                  >
+                    Choose a company from the dropdown above to view detailed information
+                  </Typography>
+                </Box>
               )}
             </Paper>
           </Grid>
