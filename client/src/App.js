@@ -16,6 +16,9 @@ import Companies from './pages/Admin/Companies';
 import Users from './pages/Admin/Users';
 import Rounds from './pages/Admin/Rounds';
 import AdminLogin from './pages/Admin/AdminLogin';
+import UserLayout from './pages/UserLayout';
+import MainLayout from './components/MainLayout';
+import AdminLeaderboard from './pages/Admin/AdminLeaderboard';
 
 const theme = createTheme({
   palette: {
@@ -131,7 +134,16 @@ function App() {
                 <Route path="companies" element={<Companies />} />
                 <Route path="users" element={<Users />} />
                 <Route path="rounds" element={<Rounds />} />
+                <Route path="leaderboard" element={<AdminLeaderboard />} />
                 <Route index element={<Navigate to="companies" replace />} />
+              </Route>
+              <Route 
+                path="/user"
+                element={isAuthenticated ? <UserLayout /> : <Navigate to="/login" replace />}
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="trade" element={<Trade />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
               </Route>
             </Routes>
           </Container>

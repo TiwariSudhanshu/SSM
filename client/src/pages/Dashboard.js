@@ -301,7 +301,7 @@ const Dashboard = () => {
             </Box>
             <CardContent sx={{ p: 0 }}>
               <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
-                Overall Performance
+               Final Score
               </Typography>
               <Typography
                 sx={{

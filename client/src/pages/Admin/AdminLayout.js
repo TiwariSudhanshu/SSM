@@ -7,6 +7,7 @@ import {
   LineChartOutlined,
   LogoutOutlined,
   PlayCircleOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -42,7 +43,14 @@ const AdminLayout = () => {
       icon: <PlayCircleOutlined />,
       label: <Link to="/admin/rounds">Round Management</Link>,
     },
+    {
+      key: '/admin/leaderboard',
+      icon: <TrophyOutlined />,
+      label: <Link to="/admin/leaderboard">Leaderboard</Link>,
+    },
   ];
+
+  const selectedKeys = menuItems.filter(item => location.pathname.startsWith(item.key)).map(item => item.key);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -67,7 +75,7 @@ const AdminLayout = () => {
         <Sider width={200} style={{ background: '#fff' }}>
           <Menu
             mode="inline"
-            selectedKeys={[location.pathname]}
+            selectedKeys={selectedKeys}
             style={{ height: '100%', borderRight: 0 }}
             items={menuItems}
           />

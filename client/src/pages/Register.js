@@ -77,17 +77,19 @@ const Register = () => {
       }}
     >
       <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, sm: 4 },
-          width: "100%",
-          maxWidth: 420,
-          backgroundColor: "#ffffff",
-          border: "2px solid #e8f5e8",
-          borderRadius: "16px",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
-        }}
-      >
+          elevation={8}
+          sx={{
+            p: 5,
+            width: "100%",
+            maxWidth: 600,
+            background: "rgba(255, 255, 255, 0.75)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "2px solid rgba(143, 188, 143, 0.5)",
+            borderRadius: "20px",
+            boxShadow: "0 12px 32px rgba(107, 142, 35, 0.3)",
+          }}
+        >
         <Typography
           variant="h4"
           component="h1"

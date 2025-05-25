@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -12,8 +12,8 @@ import {
   Link as MuiLink,
   createTheme,
   ThemeProvider,
-} from "@mui/material"
-import { login } from "../services/api"
+} from "@mui/material";
+import { login } from "../services/api";
 
 // Create a custom green theme
 const greenTheme = createTheme({
@@ -79,38 +79,38 @@ const greenTheme = createTheme({
       },
     },
   },
-})
+});
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const [error, setError] = useState("")
+  });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await login(formData.email, formData.password)
-      localStorage.setItem("token", response.token)
+      const response = await login(formData.email, formData.password);
+      localStorage.setItem("token", response.token);
       if (response.isAdmin) {
-        localStorage.setItem("isAdmin", "true")
-        window.location.href = "/admin"
+        localStorage.setItem("isAdmin", "true");
+        window.location.href = "/admin";
       } else {
-        window.location.href = "/dashboard"
+        window.location.href = "/dashboard";
       }
     } catch (err) {
-      setError(err.message || "Login failed")
+      setError(err.message || "Login failed");
     }
-  }
+  };
 
   return (
     <ThemeProvider theme={greenTheme}>
@@ -129,11 +129,13 @@ const Login = () => {
           sx={{
             p: 5,
             width: "100%",
-            maxWidth: 420,
-            backgroundColor: "#FFFFFF",
-            border: "2px solid #8FBC8F",
-            borderRadius: "16px",
-            boxShadow: "0 8px 32px rgba(107, 142, 35, 0.15)",
+            maxWidth: 600,
+            background: "rgba(255, 255, 255, 0.75)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "2px solid rgba(143, 188, 143, 0.5)",
+            borderRadius: "20px",
+            boxShadow: "0 12px 32px rgba(107, 142, 35, 0.3)",
           }}
         >
           <Typography
@@ -245,7 +247,7 @@ const Login = () => {
         </Paper>
       </Box>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

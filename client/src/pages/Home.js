@@ -42,7 +42,7 @@ const Home = () => {
     {
       number: 4,
       title: "Ascend the Leaderboard",
-      description: "Compete with players globally and climb the rankings.",
+      description: "Compete with players  and climb the rankings.",
       icon: <Trophy size={24} color="white" />,
     },
   ]

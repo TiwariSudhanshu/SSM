@@ -95,7 +95,9 @@ const Navbar = () => {
             display: "flex",
             alignItems: "center",
             flexGrow: 1,
+            cursor: "pointer",
           }}
+          onClick={() => window.location.href=("/")}
         >
           <Box
             sx={{

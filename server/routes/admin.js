@@ -295,4 +295,19 @@ router.get('/rounds/status', async (req, res) => {
   }
 });
 
+// Get top 10 users by final score
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const topUsers = await User.find()
+      .sort({ finalScore: -1 })
+      .limit(10)
+      .select('name finalScore'); // Select only name and finalScore
+
+    res.json(topUsers);
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ message: 'Failed to fetch leaderboard' });
+  }
+});
+
 module.exports = router; 
