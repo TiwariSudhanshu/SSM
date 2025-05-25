@@ -350,25 +350,22 @@ const Dashboard = () => {
                       Financial Overview
                     </Typography>
                   </Box>
-                  <Box sx={{ "& > *": { mb: 2 } }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6c757d", fontSize: "0.95rem" }}>Total Value:</Typography>
-                      <Typography sx={{ color: "#495057", fontWeight: 600 }}>
-                        ${portfolio?.portfolioValue?.toFixed(2)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6c757d", fontSize: "0.95rem" }}>Cash Balance:</Typography>
-                      <Typography sx={{ color: "#495057", fontWeight: 600 }}>
-                        ${portfolio?.cashBalance?.toFixed(2)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6c757d", fontSize: "0.95rem" }}>Normalized Value:</Typography>
-                      <Typography sx={{ color: "#495057", fontWeight: 600 }}>
-                        {portfolio?.normalizedValue?.toFixed(2)}
-                      </Typography>
-                    </Box>
+                  <Box sx={{ "& > *": { mb: 1.5 } }}>
+                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                      <strong style={{ color: "#2d5016" }}>Total Value:</strong> ₹{portfolio?.portfolioValue?.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                      <strong style={{ color: "#2d5016" }}>Average ESG Score:</strong> {portfolio?.avgESGScore?.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                      <strong style={{ color: "#2d5016" }}>Normalized Value:</strong> {portfolio?.normalizedValue?.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                      <strong style={{ color: "#2d5016" }}>Cash Balance:</strong> ₹{portfolio?.balance?.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                      <strong style={{ color: "#2d5016" }}>Total Holdings:</strong> {portfolio?.holdings?.length || 0}
+                    </Typography>
                   </Box>
                 </Box>
               </Grid>
@@ -488,7 +485,7 @@ const Dashboard = () => {
                         {holding.shares}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#7cb342", fontWeight: 600 }}>
-                        ${(holding.shares * holding.company.stockPrice).toFixed(2)}
+                        ₹{(holding.shares * holding.company.stockPrice).toFixed(2)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -538,7 +535,7 @@ const Dashboard = () => {
                       <TableCell sx={{ color: "#495057", fontWeight: 500 }}>{company.name}</TableCell>
                       <TableCell sx={{ color: "#6c757d" }}>{company.sector}</TableCell>
                       <TableCell align="right" sx={{ color: "#7cb342", fontWeight: 600 }}>
-                        ${company.stockPrice?.toFixed(2)}
+                        ₹{company.stockPrice?.toFixed(2)}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
                         {company.availableShares?.toLocaleString()}
@@ -547,7 +544,7 @@ const Dashboard = () => {
                         {company.esgScore?.toFixed(1)}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
-                        ${(company.stockPrice * company.availableShares)?.toLocaleString()}
+                        ₹{(company.stockPrice * company.availableShares)?.toLocaleString()}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -25,7 +25,8 @@ router.post('/execute', protect, async (req, res) => {
             if (company.availableShares < shares) {
                 return res.status(400).json({ message: 'Not enough shares available' });
             }
-            if (user.portfolioValue < (company.stockPrice * shares)) {
+            // Validate sufficient balance for buy
+            if (user.balance < (company.stockPrice * shares)) {
                 return res.status(400).json({ message: 'Insufficient funds' });
             }
         } else if (type === 'SELL') {
@@ -37,13 +38,12 @@ router.post('/execute', protect, async (req, res) => {
 
         // Calculate trade values
         const tradeValue = company.stockPrice * shares;
-        const totalValue = type === 'BUY' ? -tradeValue : tradeValue;
 
         // Update company shares
         company.availableShares += type === 'BUY' ? -shares : shares;
         await company.save();
 
-        // Update user holdings
+        // Update user holdings and balance
         const holdingIndex = user.holdings.findIndex(h => h.company.toString() === companyId);
         if (holdingIndex === -1 && type === 'BUY') {
             user.holdings.push({ company: companyId, shares });
@@ -54,8 +54,26 @@ router.post('/execute', protect, async (req, res) => {
             }
         }
 
-        // Update user portfolio value
-        user.portfolioValue += totalValue;
+        // Update balance based on trade type
+        user.balance += type === 'BUY' ? -tradeValue : tradeValue;
+
+        // Recalculate portfolioValue based on initial balance + value of holdings
+        let holdingsValue = 0;
+        // Fetch companies data if not already available (assuming we have it populated or can fetch)
+        // For now, let's assume user.holdings.company is populated with company details including stockPrice
+        if (user.holdings && user.holdings.length > 0) {
+            holdingsValue = user.holdings.reduce((total, holding) => {
+                // Find the company details from the populated holding or fetch if necessary
+                const companyDetails = companies.find(comp => comp._id.toString() === holding.company.toString());
+                if (companyDetails) {
+                     return total + (holding.shares * companyDetails.stockPrice);
+                }
+               return total;
+            }, 0);
+        }
+        // Assuming initial balance is 100000 (as set during registration)
+        user.portfolioValue = 100000 + holdingsValue;
+
         await user.save();
 
         // Create trade record
@@ -84,7 +102,8 @@ router.post('/execute', protect, async (req, res) => {
             stockPrice: company.stockPrice
         });
 
-        res.json({ trade, user, company });
+        // Include updated user object (with balance and portfolioValue) in the response
+        res.json({ trade, user: user.toObject(), company });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

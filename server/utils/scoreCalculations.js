@@ -14,11 +14,12 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
     const avgESGScore = totalShares > 0 ? totalESGScore / totalShares : 0;
 
     // Calculate Portfolio Value
-    let portfolioValue = user.initialBalance || 100000; // Default initial balance
+    // Portfolio Value is the sum of cashBalance and the value of holdings
+    let portfolioValue = user.balance || 0; // Start with balance
     user.holdings.forEach(holding => {
         const company = companies.find(c => c._id.toString() === holding.company.toString());
         if (company) {
-            portfolioValue += holding.shares * company.stockPrice;
+            portfolioValue += holding.shares * company.stockPrice; // Add value of holdings
         }
     });
 

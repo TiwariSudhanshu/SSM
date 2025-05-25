@@ -19,7 +19,8 @@ router.post('/register', async (req, res) => {
             name,
             email,
             password,
-            portfolioValue: 100000, // Starting portfolio value
+            balance: 100000, // Initialize balance with 100000
+            portfolioValue: 100000, // Initialize portfolioValue (will be recalculated)
             esgScore: 0,
             holdings: []
         });
@@ -35,6 +36,7 @@ router.post('/register', async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            balance: user.balance, // Include balance in the response
             portfolioValue: user.portfolioValue,
             esgScore: user.esgScore,
             token

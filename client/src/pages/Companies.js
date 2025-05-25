@@ -120,11 +120,11 @@ const Companies = () => {
                 <TableRow key={company._id}>
                   <TableCell>{company.name}</TableCell>
                   <TableCell>{company.sector}</TableCell>
-                  <TableCell align="right">${company.stockPrice?.toFixed(2)}</TableCell>
+                  <TableCell align="right">₹{company.stockPrice?.toFixed(2)}</TableCell>
                   <TableCell align="right">{company.availableShares?.toLocaleString()}</TableCell>
                   <TableCell align="right">{company.esgScore?.toFixed(2)}</TableCell>
                   <TableCell align="right">
-                    ${(company.stockPrice * company.availableShares)?.toLocaleString()}
+                    ₹{(company.stockPrice * company.availableShares)?.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}

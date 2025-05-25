@@ -145,9 +145,9 @@ const Companies = () => {
                 <TableRow key={company._id} hover>
                   <TableCell>{company.name}</TableCell>
                   <TableCell>{company.sector}</TableCell>
-                  <TableCell>${(company.stockPrice || 0).toFixed(2)}</TableCell>
-                  <TableCell>{company.esgScore || 0}</TableCell>
-                  <TableCell>{company.availableShares || 0}</TableCell>
+                  <TableCell align="right">₹{(company.stockPrice || 0).toFixed(2)}</TableCell>
+                  <TableCell align="right">{company.esgScore || 0}</TableCell>
+                  <TableCell align="right">{company.availableShares || 0}</TableCell>
                   <TableCell>
                     <IconButton
                       color="primary"

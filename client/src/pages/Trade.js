@@ -302,7 +302,7 @@ const Trade = () => {
                   <Select value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)} required>
                     {companies.map((company) => (
                       <MenuItem key={company._id} value={company._id}>
-                        {company.name} - ${company.stockPrice}
+                        {company.name} - ₹{company.stockPrice}
                       </MenuItem>
                     ))}
                   </Select>
@@ -366,7 +366,7 @@ const Trade = () => {
                           <strong style={{ color: "#2d5016" }}>Sector:</strong> {company.sector}
                         </Typography>
                         <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                          <strong style={{ color: "#2d5016" }}>Stock Price:</strong> ${company.stockPrice}
+                          <strong style={{ color: "#2d5016" }}>Stock Price:</strong> ₹{company.stockPrice}
                         </Typography>
                         <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
                           <strong style={{ color: "#2d5016" }}>Available Shares:</strong> {company.availableShares}

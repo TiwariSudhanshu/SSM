@@ -85,7 +85,7 @@ const Users = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>${(user.balance || 0).toFixed(2)}</TableCell>
+                  <TableCell>₹{(user.balance || 0).toFixed(2)}</TableCell>
                   <TableCell>
                     <IconButton
                       color="primary"
@@ -130,7 +130,7 @@ const Users = () => {
                 <strong>Role:</strong> {selectedUser.role || 'USER'}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                <strong>Balance:</strong> ${(selectedUser.balance || 0).toFixed(2)}
+                <strong>Balance:</strong> ₹{(selectedUser.balance || 0).toFixed(2)}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 <strong>Created At:</strong>{' '}
