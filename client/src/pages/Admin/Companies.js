@@ -1,21 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import {
-  Table,
+  Box,
   Button,
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Space,
-} from 'antd';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  IconButton,
+  Card,
+  CardContent,
+} from '@mui/material';
+import { Edit as EditIcon } from '@mui/icons-material';
 
 const Companies = () => {
   const [companies, setCompanies] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
-  const [form] = Form.useForm();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [formData, setFormData] = useState({
+    name: '',
+    sector: '',
+    description: '',
+    stockPrice: '',
+    esgScore: '',
+    availableShares: '',
+  });
 
   const fetchCompanies = async () => {
     try {
@@ -23,7 +44,6 @@ const Companies = () => {
       setCompanies(response.data);
     } catch (error) {
       console.error('Error fetching companies:', error);
-      message.error('Failed to fetch companies');
     }
   };
 
@@ -34,142 +54,203 @@ const Companies = () => {
   const handleAddEdit = (company = null) => {
     setEditingCompany(company);
     if (company) {
-      form.setFieldsValue(company);
+      setFormData({
+        name: company.name || '',
+        sector: company.sector || '',
+        description: company.description || '',
+        stockPrice: company.stockPrice || '',
+        esgScore: company.esgScore || '',
+        availableShares: company.availableShares || '',
+      });
     } else {
-      form.resetFields();
+      setFormData({
+        name: '',
+        sector: '',
+        description: '',
+        stockPrice: '',
+        esgScore: '',
+        availableShares: '',
+      });
     }
     setIsModalVisible(true);
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       if (editingCompany) {
-        await api.put(`/admin/companies/${editingCompany._id}`, values);
-        message.success('Company updated successfully');
+        await api.put(`/admin/companies/${editingCompany._id}`, formData);
       } else {
-        await api.post('/admin/companies', values);
-        message.success('Company added successfully');
+        await api.post('/admin/companies', formData);
       }
       setIsModalVisible(false);
       fetchCompanies();
     } catch (error) {
       console.error('Error submitting company:', error);
-      message.error('Operation failed');
     }
   };
 
-  const columns = [
-    {
-      title: 'Company Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Sector',
-      dataIndex: 'sector',
-      key: 'sector',
-    },
-    {
-      title: 'Stock Price',
-      dataIndex: 'stockPrice',
-      key: 'stockPrice',
-      render: (price) => `$${(price || 0).toFixed(2)}`,
-    },
-    {
-      title: 'ESG Score',
-      dataIndex: 'esgScore',
-      key: 'esgScore',
-      render: (score) => score || 0,
-    },
-    {
-      title: 'Available Shares',
-      dataIndex: 'availableShares',
-      key: 'availableShares',
-      render: (shares) => shares || 0,
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <Space>
-          <Button type="primary" onClick={() => handleAddEdit(record)}>
-            Edit
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <Button type="primary" onClick={() => handleAddEdit()}>
-          Add New Company
-        </Button>
-      </div>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: '#2d5016', fontWeight: 'bold' }}>
+        Company Management
+      </Typography>
 
-      <Table columns={columns} dataSource={companies} rowKey="_id" />
+      <Card sx={{ mb: 3, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}>
+        <CardContent>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleAddEdit()}
+            startIcon={<EditIcon />}
+          >
+            Add New Company
+          </Button>
+        </CardContent>
+      </Card>
 
-      <Modal
-        title={editingCompany ? 'Edit Company' : 'Add New Company'}
+      <TableContainer component={Paper} sx={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#f8fdf8' }}>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>Company Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>Sector</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>Stock Price</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>ESG Score</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>Available Shares</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: '#2d5016' }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {companies
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((company) => (
+                <TableRow key={company._id} hover>
+                  <TableCell>{company.name}</TableCell>
+                  <TableCell>{company.sector}</TableCell>
+                  <TableCell>${(company.stockPrice || 0).toFixed(2)}</TableCell>
+                  <TableCell>{company.esgScore || 0}</TableCell>
+                  <TableCell>{company.availableShares || 0}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleAddEdit(company)}
+                      size="small"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={companies.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+
+      <Dialog
         open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
+        onClose={() => setIsModalVisible(false)}
+        maxWidth="sm"
+        fullWidth
       >
-        <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item
-            name="name"
-            label="Company Name"
-            rules={[{ required: true, message: 'Please enter company name' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="sector"
-            label="Sector"
-            rules={[{ required: true, message: 'Please enter sector' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: 'Please enter description' }]}
-          >
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item
-            name="stockPrice"
-            label="Stock Price"
-            rules={[{ required: true, message: 'Please enter stock price' }]}
-          >
-            <InputNumber min={0} step={0.01} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            name="esgScore"
-            label="ESG Score"
-            rules={[
-              { required: true, message: 'Please enter ESG score' },
-              { type: 'number', min: 0, max: 100, message: 'ESG score must be between 0 and 100' }
-            ]}
-          >
-            <InputNumber min={0} max={100} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            name="availableShares"
-            label="Available Shares"
-            rules={[{ required: true, message: 'Please enter available shares' }]}
-          >
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
+        <DialogTitle>
+          {editingCompany ? 'Edit Company' : 'Add New Company'}
+        </DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <DialogContent>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                name="name"
+                label="Company Name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
+              <TextField
+                name="sector"
+                label="Sector"
+                value={formData.sector}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
+              <TextField
+                name="description"
+                label="Description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                multiline
+                rows={4}
+                fullWidth
+              />
+              <TextField
+                name="stockPrice"
+                label="Stock Price"
+                type="number"
+                value={formData.stockPrice}
+                onChange={handleChange}
+                required
+                fullWidth
+                inputProps={{ min: 0, step: 0.01 }}
+              />
+              <TextField
+                name="esgScore"
+                label="ESG Score"
+                type="number"
+                value={formData.esgScore}
+                onChange={handleChange}
+                required
+                fullWidth
+                inputProps={{ min: 0, max: 100 }}
+              />
+              <TextField
+                name="availableShares"
+                label="Available Shares"
+                type="number"
+                value={formData.availableShares}
+                onChange={handleChange}
+                required
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsModalVisible(false)}>Cancel</Button>
+            <Button type="submit" variant="contained" color="primary">
               {editingCompany ? 'Update' : 'Add'}
             </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Box>
   );
 };
 

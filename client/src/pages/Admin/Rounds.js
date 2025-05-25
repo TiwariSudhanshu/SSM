@@ -1,13 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, message, Space, Typography, Modal, Form, InputNumber } from 'antd';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Paper,
+} from '@mui/material';
+import {
+  PlayArrow as PlayArrowIcon,
+  Stop as StopIcon,
+  Timer as TimerIcon,
+} from '@mui/icons-material';
 import api from '../../services/api';
-
-const { Title } = Typography;
 
 const Rounds = () => {
   const [currentRound, setCurrentRound] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
+  const [duration, setDuration] = useState('');
 
   const fetchCurrentRound = async () => {
     try {
@@ -22,78 +38,136 @@ const Rounds = () => {
     fetchCurrentRound();
   }, []);
 
-  const handleStartRound = async (values) => {
+  const handleStartRound = async (e) => {
+    e.preventDefault();
     try {
-      await api.post('/admin/rounds/start', values);
-      message.success('Round started successfully');
+      await api.post('/admin/rounds/start', { duration: parseInt(duration) });
       setIsModalVisible(false);
-      form.resetFields();
+      setDuration('');
       fetchCurrentRound();
     } catch (error) {
-      message.error('Failed to start round');
+      console.error('Error starting round:', error);
     }
   };
 
   const handleEndRound = async () => {
     try {
       await api.post('/admin/rounds/end');
-      message.success('Round ended successfully');
       fetchCurrentRound();
     } catch (error) {
-      message.error('Failed to end round');
+      console.error('Error ending round:', error);
     }
   };
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Title level={2}>Round Management</Title>
-      
-      <Card style={{ marginBottom: '24px' }}>
-        <Title level={4}>Current Round Status</Title>
-        {currentRound ? (
-          <div>
-            <p><strong>Round Number:</strong> {currentRound.roundNumber}</p>
-            <p><strong>Status:</strong> {currentRound.isActive ? 'Active' : 'Ended'}</p>
-            <p><strong>Start Time:</strong> {new Date(currentRound.startTime).toLocaleString()}</p>
-            <p><strong>End Time:</strong> {new Date(currentRound.endTime).toLocaleString()}</p>
-            {currentRound.isActive && (
-              <Button type="primary" danger onClick={handleEndRound}>
-                End Round
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div>
-            <p>No active round</p>
-            <Button type="primary" onClick={() => setIsModalVisible(true)}>
-              Start New Round
-            </Button>
-          </div>
-        )}
-      </Card>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: '#2d5016', fontWeight: 'bold' }}>
+        Round Management
+      </Typography>
 
-      <Modal
-        title="Start New Round"
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Card sx={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}>
+            <CardContent>
+              <Typography variant="h5" sx={{ mb: 3, color: '#2d5016' }}>
+                Current Round Status
+              </Typography>
+
+              {currentRound ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Paper sx={{ p: 2, bgcolor: '#f8fdf8' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <TimerIcon color="primary" />
+                      <Typography variant="h6">Round {currentRound.roundNumber}</Typography>
+                    </Box>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: currentRound.isActive ? '#52c41a' : '#ff4d4f',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      Status: {currentRound.isActive ? 'Active' : 'Ended'}
+                    </Typography>
+                  </Paper>
+
+                  <Paper sx={{ p: 2, bgcolor: '#f8fdf8' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Start Time
+                    </Typography>
+                    <Typography>
+                      {new Date(currentRound.startTime).toLocaleString()}
+                    </Typography>
+                  </Paper>
+
+                  <Paper sx={{ p: 2, bgcolor: '#f8fdf8' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      End Time
+                    </Typography>
+                    <Typography>
+                      {new Date(currentRound.endTime).toLocaleString()}
+                    </Typography>
+                  </Paper>
+
+                  {currentRound.isActive && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      startIcon={<StopIcon />}
+                      onClick={handleEndRound}
+                      fullWidth
+                    >
+                      End Round
+                    </Button>
+                  )}
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Typography color="text.secondary">No active round</Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PlayArrowIcon />}
+                    onClick={() => setIsModalVisible(true)}
+                    fullWidth
+                  >
+                    Start New Round
+                  </Button>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Dialog
         open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
+        onClose={() => setIsModalVisible(false)}
+        maxWidth="xs"
+        fullWidth
       >
-        <Form form={form} onFinish={handleStartRound} layout="vertical">
-          <Form.Item
-            name="duration"
-            label="Round Duration (minutes)"
-            rules={[{ required: true, message: 'Please enter round duration' }]}
-          >
-            <InputNumber min={1} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
+        <DialogTitle>Start New Round</DialogTitle>
+        <form onSubmit={handleStartRound}>
+          <DialogContent>
+            <TextField
+              label="Round Duration (minutes)"
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              required
+              fullWidth
+              inputProps={{ min: 1 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsModalVisible(false)}>Cancel</Button>
+            <Button type="submit" variant="contained" color="primary">
               Start Round
             </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Box>
   );
 };
 
