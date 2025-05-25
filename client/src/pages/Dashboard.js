@@ -28,19 +28,19 @@ const Dashboard = () => {
   const [error, setError] = useState("")
   const { isActive, tradeEnabled } = useRoundStatus()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [portfolioData, companiesData] = await Promise.all([getPortfolio(), getCompanies()])
-        setPortfolio(portfolioData)
-        setCompanies(companiesData)
-      } catch (err) {
-        setError("Failed to fetch data")
-      } finally {
-        setLoading(false)
-      }
+  const fetchData = async () => {
+    try {
+      const [portfolioData, companiesData] = await Promise.all([getPortfolio(), getCompanies()])
+      setPortfolio(portfolioData)
+      setCompanies(companiesData)
+    } catch (err) {
+      setError("Failed to fetch data")
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchData()
 
     // Socket.IO listeners
@@ -53,12 +53,21 @@ const Dashboard = () => {
       setError("Socket connection failed")
       return
     }
+
+    // Listen for trade updates
     SocketService.onTradeUpdate((data) => {
       if (data.userId === portfolio?._id) {
         fetchData()
       }
     })
+
+    // Listen for company updates
     SocketService.onCompanyUpdate(() => {
+      fetchData()
+    })
+
+    // Listen for round status updates
+    SocketService.onRoundUpdate(() => {
       fetchData()
     })
 
@@ -224,7 +233,7 @@ const Dashboard = () => {
           <Paper sx={metricCardStyle}>
             <Typography sx={{ color: "#6b7280", fontSize: "0.875rem", mb: 1 }}>ESG Score</Typography>
             <Typography sx={{ color: "#2d5016", fontSize: "2.5rem", fontWeight: "bold", mb: 2 }}>
-              {portfolio?.esgScore || 0}%
+              {portfolio?.esgScore?.toFixed(1) || 0}%
             </Typography>
             <LinearProgress variant="determinate" value={portfolio?.esgScore || 0} sx={progressBarStyle} />
           </Paper>
@@ -234,7 +243,7 @@ const Dashboard = () => {
           <Paper sx={metricCardStyle}>
             <Typography sx={{ color: "#6b7280", fontSize: "0.875rem", mb: 1 }}>Diversity Score</Typography>
             <Typography sx={{ color: "#2d5016", fontSize: "2.5rem", fontWeight: "bold", mb: 2 }}>
-              {portfolio?.sectorScore?.toFixed(0) || 0}%
+              {portfolio?.sectorScore?.toFixed(1) || 0}%
             </Typography>
             <LinearProgress variant="determinate" value={portfolio?.sectorScore || 0} sx={progressBarStyle} />
           </Paper>
@@ -244,7 +253,7 @@ const Dashboard = () => {
           <Paper sx={metricCardStyle}>
             <Typography sx={{ color: "#6b7280", fontSize: "0.875rem", mb: 1 }}>Overall Performance</Typography>
             <Typography sx={{ color: "#2d5016", fontSize: "2.5rem", fontWeight: "bold", mb: 2 }}>
-              {portfolio?.finalScore?.toFixed(0) || 0}%
+              {portfolio?.finalScore?.toFixed(1) || 0}%
             </Typography>
             <LinearProgress variant="determinate" value={portfolio?.finalScore || 0} sx={progressBarStyle} />
           </Paper>
@@ -266,6 +275,12 @@ const Dashboard = () => {
               <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
                 <strong style={{ color: "#2d5016" }}>Normalized Value:</strong> {portfolio?.normalizedValue?.toFixed(2)}
               </Typography>
+              <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                <strong style={{ color: "#2d5016" }}>Cash Balance:</strong> ${portfolio?.cashBalance?.toFixed(2)}
+              </Typography>
+              <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
+                <strong style={{ color: "#2d5016" }}>Total Holdings:</strong> {portfolio?.holdings?.length || 0}
+              </Typography>
             </Box>
 
             {portfolio?.sectorDistribution && (
@@ -276,11 +291,7 @@ const Dashboard = () => {
                     <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
                       <Typography sx={{ color: "#374151", fontSize: "0.875rem" }}>{sector}</Typography>
                       <Typography sx={{ color: "#2d5016", fontWeight: 600, fontSize: "0.875rem" }}>
-                        {(
-                          (shares / portfolio.holdings.reduce((total, holding) => total + holding.shares, 0)) *
-                          100
-                        ).toFixed(0)}
-                        %
+                        {((shares / portfolio.holdings.reduce((total, holding) => total + holding.shares, 0)) * 100).toFixed(1)}%
                       </Typography>
                     </Box>
                     <LinearProgress
@@ -308,6 +319,7 @@ const Dashboard = () => {
                     <TableCell>Company</TableCell>
                     <TableCell align="right">Shares</TableCell>
                     <TableCell align="right">Value</TableCell>
+                    <TableCell align="right">ESG Score</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -316,6 +328,7 @@ const Dashboard = () => {
                       <TableCell>{holding.company.name}</TableCell>
                       <TableCell align="right">{holding.shares}</TableCell>
                       <TableCell align="right">${(holding.shares * holding.company.stockPrice).toFixed(2)}</TableCell>
+                      <TableCell align="right">{holding.company.esgScore?.toFixed(1)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -339,6 +352,7 @@ const Dashboard = () => {
                     <TableCell align="right">Stock Price</TableCell>
                     <TableCell align="right">Available Shares</TableCell>
                     <TableCell align="right">ESG Score</TableCell>
+                    <TableCell align="right">Market Cap</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -346,9 +360,12 @@ const Dashboard = () => {
                     <TableRow key={company._id}>
                       <TableCell>{company.name}</TableCell>
                       <TableCell>{company.sector}</TableCell>
-                      <TableCell align="right">${company.stockPrice.toFixed(2)}</TableCell>
-                      <TableCell align="right">{company.availableShares}</TableCell>
-                      <TableCell align="right">{company.esgScore}</TableCell>
+                      <TableCell align="right">${company.stockPrice?.toFixed(2)}</TableCell>
+                      <TableCell align="right">{company.availableShares?.toLocaleString()}</TableCell>
+                      <TableCell align="right">{company.esgScore?.toFixed(1)}</TableCell>
+                      <TableCell align="right">
+                        ${(company.stockPrice * company.availableShares)?.toLocaleString()}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
