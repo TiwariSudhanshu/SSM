@@ -6,7 +6,7 @@ const initializeSocket = (server) => {
     try {
         io = socketIO(server, {
             cors: {
-                origin: "http://localhost:3000",
+                origin: "https://stockmarketsimulator.vercel.app/",
                 methods: ["GET", "POST"],
                 credentials: true
             },
