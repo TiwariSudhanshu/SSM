@@ -6,7 +6,8 @@ const useRoundStatus = () => {
   const [roundStatus, setRoundStatus] = useState({
     isActive: false,
     tradeEnabled: false,
-    round: null
+    round: null,
+    metrics: null
   });
 
   useEffect(() => {
@@ -24,13 +25,15 @@ const useRoundStatus = () => {
         setRoundStatus({
           isActive: true,
           tradeEnabled: true,
-          round: data.round
+          round: data.round,
+          metrics: null
         });
       } else if (data.type === 'end') {
         setRoundStatus({
           isActive: false,
           tradeEnabled: false,
-          round: data.round
+          round: data.round,
+          metrics: data.metrics
         });
       }
     };

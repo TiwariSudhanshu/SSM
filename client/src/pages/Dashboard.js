@@ -76,8 +76,11 @@ const Dashboard = () => {
     })
 
     // Listen for round status updates
-    SocketService.onRoundUpdate(() => {
-      fetchData()
+    SocketService.onRoundUpdate((data) => {
+      if (data.type === 'end' && data.metrics) {
+        // Refresh data when round ends and metrics are received
+        fetchData();
+      }
     })
 
     return () => {

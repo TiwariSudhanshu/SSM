@@ -181,14 +181,50 @@ router.post('/rounds/start', async (req, res) => {
     setTimeout(async () => {
       const currentRound = await Round.findOne({ _id: round._id, isActive: true });
       if (currentRound) {
+        // Get all companies and users for calculations
+        const [companies, users] = await Promise.all([
+          Company.find(),
+          User.find()
+        ]);
+
+        // Calculate metrics for each user
+        const userMetrics = users.map(user => {
+          const metrics = calculatePortfolioMetrics(user, companies, users);
+          
+          return User.findByIdAndUpdate(
+            user._id,
+            {
+              portfolioValue: metrics.portfolioValue,
+              avgESGScore: metrics.avgESGScore,
+              normalizedValue: metrics.normalizedValue,
+              sectorScore: metrics.sectorScore,
+              finalScore: metrics.finalScore,
+              sectorDistribution: metrics.sectorDistribution
+            },
+            { new: true }
+          );
+        });
+
+        await Promise.all(userMetrics);
+
+        // End the round and disable trading
         currentRound.isActive = false;
         currentRound.tradeEnabled = false;
         await currentRound.save();
 
-        // Notify all clients about the round end
+        // Notify all clients about the round end and new metrics
         io.emit('roundUpdate', {
           type: 'end',
-          round: currentRound
+          round: currentRound,
+          metrics: users.map(user => ({
+            userId: user._id,
+            portfolioValue: user.portfolioValue,
+            avgESGScore: user.avgESGScore,
+            normalizedValue: user.normalizedValue,
+            sectorScore: user.sectorScore,
+            finalScore: user.finalScore,
+            sectorDistribution: user.sectorDistribution
+          }))
         });
       }
     }, timeUntilEnd);
