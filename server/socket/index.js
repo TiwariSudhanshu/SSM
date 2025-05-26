@@ -6,9 +6,10 @@ const initializeSocket = (server) => {
     try {
         io = socketIO(server, {
             cors: {
-                origin: "https://stocks.ecellrgpv.com/",
+                origin: ["https://stocks.ecellrgpv.com", "https://stock-market-simulator-xlyy.onrender.com"],
                 methods: ["GET", "POST"],
-                credentials: true
+                credentials: true,
+                allowedHeaders: ["Content-Type", "Authorization"]
             },
             pingTimeout: 60000,
             pingInterval: 25000

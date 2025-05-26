@@ -35,7 +35,10 @@ class SocketService {
                     reconnection: true,
                     reconnectionAttempts: 5,
                     reconnectionDelay: 1000,
-                    timeout: 10000
+                    timeout: 10000,
+                    transports: ['websocket', 'polling'],
+                    withCredentials: true,
+                    forceNew: true
                 });
 
                 this.socket.on('connect', () => {
