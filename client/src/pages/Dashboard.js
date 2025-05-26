@@ -18,11 +18,17 @@ import {
   Card,
   CardContent,
 } from "@mui/material"
-import { TrendingUp, RecycleIcon as Eco, BarChart3, Clock, DollarSign, PieChart, Building2 } from "lucide-react"
+import { TrendingUp, RecycleIcon as Eco, BarChart3, Clock, DollarSign, PieChart, Building2 } from 'lucide-react'
 import { getPortfolio, getCompanies } from "../services/api"
 import SocketService from "../services/socket"
 import RoundTimer from "../components/RoundTimer"
 import useRoundStatus from "../hooks/useRoundStatus"
+
+// Utility function to format numbers with Indian comma notation
+const formatIndianCurrency = (amount) => {
+  if (amount === null || amount === undefined) return "0";
+  return new Intl.NumberFormat('en-IN').format(amount);
+};
 
 const Dashboard = () => {
   const [portfolio, setPortfolio] = useState(null)
@@ -249,10 +255,12 @@ const Dashboard = () => {
         <Grid item xs={12} md={4}>
           <Card sx={metricCardStyle}>
             <Box sx={iconStyle}>
-              <TrendingUp size={20} />
+              <DollarSign size={20} />
             </Box>
             <CardContent sx={{ p: 0 }}>
-              <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>ESG Score</Typography>
+              <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+                Cash Balance
+              </Typography>
               <Typography
                 sx={{
                   color: "#7cb342",
@@ -262,9 +270,11 @@ const Dashboard = () => {
                   lineHeight: 1,
                 }}
               >
-                {portfolio?.esgScore?.toFixed(0) || 0}%
+                ₹{formatIndianCurrency(portfolio?.balance?.toFixed(0) || 0)}
               </Typography>
-              <LinearProgress variant="determinate" value={portfolio?.esgScore || 0} sx={progressBarStyle} />
+              <Typography sx={{ color: "#6c757d", fontSize: "0.75rem" }}>
+                Available for trading
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -276,7 +286,7 @@ const Dashboard = () => {
             </Box>
             <CardContent sx={{ p: 0 }}>
               <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
-                Diversity Score
+                Total Holdings
               </Typography>
               <Typography
                 sx={{
@@ -287,9 +297,11 @@ const Dashboard = () => {
                   lineHeight: 1,
                 }}
               >
-                {portfolio?.sectorScore?.toFixed(0) || 0}%
+                {portfolio?.holdings?.length || 0}
               </Typography>
-              <LinearProgress variant="determinate" value={portfolio?.sectorScore || 0} sx={progressBarStyle} />
+              <Typography sx={{ color: "#6c757d", fontSize: "0.75rem" }}>
+                Companies in portfolio
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -301,7 +313,7 @@ const Dashboard = () => {
             </Box>
             <CardContent sx={{ p: 0 }}>
               <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
-               Final Score
+                Final Score
               </Typography>
               <Typography
                 sx={{
@@ -335,75 +347,264 @@ const Dashboard = () => {
             </Typography>
 
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Box
+              {/* Financial Overview Cards */}
+              <Grid item xs={12}>
+                <Typography
+                  variant="h6"
                   sx={{
-                    background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-                    borderRadius: "12px",
-                    p: 3,
+                    color: "#495057",
+                    fontWeight: 600,
                     mb: 3,
+                    fontSize: "1.1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                    <DollarSign size={24} color="#7cb342" />
-                    <Typography sx={{ color: "#495057", fontWeight: 600, fontSize: "1.1rem" }}>
-                      Financial Overview
-                    </Typography>
-                  </Box>
-                  <Box sx={{ "& > *": { mb: 1.5 } }}>
-                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                      <strong style={{ color: "#2d5016" }}>Total Value:</strong> ₹{portfolio?.portfolioValue?.toFixed(2)}
-                    </Typography>
-                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                      <strong style={{ color: "#2d5016" }}>Average ESG Score:</strong> {portfolio?.avgESGScore?.toFixed(2)}
-                    </Typography>
-                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                      <strong style={{ color: "#2d5016" }}>Normalized Value:</strong> {portfolio?.normalizedValue?.toFixed(2)}
-                    </Typography>
-                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                      <strong style={{ color: "#2d5016" }}>Cash Balance:</strong> ₹{portfolio?.balance?.toFixed(2)}
-                    </Typography>
-                    <Typography sx={{ color: "#374151", fontSize: "0.95rem" }}>
-                      <strong style={{ color: "#2d5016" }}>Total Holdings:</strong> {portfolio?.holdings?.length || 0}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
+                  <DollarSign size={20} color="#7cb342" />
+                  Financial Overview
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  {/* Total Portfolio Value */}
+                  <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                      sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+                        Total Portfolio Value
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#7cb342",
+                          fontSize: "1.75rem",
+                          fontWeight: "bold",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        ₹{formatIndianCurrency(portfolio?.portfolioValue?.toFixed(2))}
+                      </Typography>
+                    </Card>
+                  </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <Box
-                  sx={{
-                    background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-                    borderRadius: "12px",
-                    p: 3,
-                    mb: 3,
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                    <Eco size={24} color="#7cb342" />
-                    <Typography sx={{ color: "#495057", fontWeight: 600, fontSize: "1.1rem" }}>ESG Metrics</Typography>
-                  </Box>
-                  <Box sx={{ "& > *": { mb: 2 } }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6c757d", fontSize: "0.95rem" }}>Average ESG Score:</Typography>
-                      <Typography sx={{ color: "#495057", fontWeight: 600 }}>
+                  {/* Average ESG Score */}
+                  <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                      sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+                        Average ESG Score
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#7cb342",
+                          fontSize: "1.75rem",
+                          fontWeight: "bold",
+                          lineHeight: 1.2,
+                        }}
+                      >
                         {portfolio?.avgESGScore?.toFixed(2)}
                       </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography sx={{ color: "#6c757d", fontSize: "0.95rem" }}>Total Holdings:</Typography>
-                      <Typography sx={{ color: "#495057", fontWeight: 600 }}>
-                        {portfolio?.holdings?.length || 0}
+                    </Card>
+                  </Grid>
+
+                  {/* Normalized Value */}
+                  <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                      sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+                        Normalized Value
                       </Typography>
-                    </Box>
-                  </Box>
-                </Box>
+                      <Typography
+                        sx={{
+                          color: "#495057",
+                          fontSize: "1.75rem",
+                          fontWeight: "bold",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {formatIndianCurrency(portfolio?.normalizedValue?.toFixed(2))}
+                      </Typography>
+                    </Card>
+                  </Grid>
+
+                  {/* Invested Amount */}
+                  <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                      sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+                        Invested Amount
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#7cb342",
+                          fontSize: "1.75rem",
+                          fontWeight: "bold",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        ₹{formatIndianCurrency(((portfolio?.portfolioValue || 0) - (portfolio?.balance || 0)).toFixed(2))}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Grid>
+
+              {/* ESG Metrics Section */}
+              <Grid item xs={12}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: "#495057",
+                    fontWeight: 600,
+                    mb: 3,
+                    mt: 4,
+                    fontSize: "1.1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                  }}
+                >
+                  <Eco size={20} color="#7cb342" />
+                  ESG Performance
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Card
+                      sx={{
+                        p: 3,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        background: "linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%)",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                        <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", fontWeight: 500 }}>
+                          Portfolio ESG Rating
+                        </Typography>
+                        <Box
+                          sx={{
+                            backgroundColor: "#7cb342",
+                            color: "white",
+                            px: 2,
+                            py: 0.5,
+                            borderRadius: "16px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {portfolio?.avgESGScore >= 8 ? "Excellent" : 
+                           portfolio?.avgESGScore >= 6 ? "Good" : 
+                           portfolio?.avgESGScore >= 4 ? "Fair" : "Poor"}
+                        </Box>
+                      </Box>
+                      <Typography
+                        sx={{
+                          color: "#7cb342",
+                          fontSize: "2.5rem",
+                          fontWeight: "bold",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {portfolio?.avgESGScore?.toFixed(1)}/10
+                      </Typography>
+                    </Card>
+                  </Grid>
+
+                  {/* Portfolio Distribution Card - Replacing Sustainability Impact */}
+                  <Grid item xs={12} sm={6}>
+                    <Card
+                      sx={{
+                        p: 3,
+                        borderRadius: "12px",
+                        border: "1px solid #e9ecef",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        background: "linear-gradient(135deg, #fefffe 0%, #f9fdf9 100%)",
+                      }}
+                    >
+                      <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 2, fontWeight: 500 }}>
+                        Portfolio Distribution
+                      </Typography>
+                      {portfolio?.sectorDistribution && Object.keys(portfolio.sectorDistribution).length > 0 ? (
+                        <Box>
+                          {Object.entries(portfolio.sectorDistribution).slice(0, 3).map(([sector, shares]) => {
+                            const totalShares = portfolio.holdings.reduce((total, holding) => total + holding.shares, 0);
+                            const percentage = totalShares > 0 ? (shares / totalShares) * 100 : 0;
+                            return (
+                              <Box key={sector} sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                                <Typography sx={{ color: "#495057", fontSize: "0.875rem" }}>
+                                  {sector}
+                                </Typography>
+                                <Typography sx={{ color: "#7cb342", fontWeight: 600, fontSize: "0.875rem" }}>
+                                  {percentage.toFixed(1)}%
+                                </Typography>
+                              </Box>
+                            );
+                          })}
+                          {Object.keys(portfolio.sectorDistribution).length > 3 && (
+                            <Typography sx={{ color: "#6c757d", fontSize: "0.75rem", mt: 1 }}>
+                              +{Object.keys(portfolio.sectorDistribution).length - 3} more sectors
+                            </Typography>
+                          )}
+                        </Box>
+                      ) : (
+                        <Typography sx={{ color: "#6c757d", fontSize: "0.875rem" }}>
+                          No investments yet
+                        </Typography>
+                      )}
+                    </Card>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
 
             {/* Portfolio Distribution */}
             {portfolio?.sectorDistribution && (
-              <Box>
+              <Box sx={{ mt: 4 }}>
                 <Typography
                   variant="h5"
                   sx={{
@@ -413,7 +614,7 @@ const Dashboard = () => {
                     fontSize: "1.5rem",
                   }}
                 >
-                  Portfolio Distribution
+                 Portfolio Distribution
                 </Typography>
                 <Grid container spacing={2}>
                   {Object.entries(portfolio.sectorDistribution).map(([sector, shares]) => {
@@ -482,10 +683,10 @@ const Dashboard = () => {
                     <TableRow key={holding.company._id} sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}>
                       <TableCell sx={{ color: "#495057" }}>{holding.company.name}</TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
-                        {holding.shares}
+                        {formatIndianCurrency(holding.shares)}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#7cb342", fontWeight: 600 }}>
-                        ₹{(holding.shares * holding.company.stockPrice).toFixed(2)}
+                        ₹{formatIndianCurrency((holding.shares * holding.company.stockPrice).toFixed(2))}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -535,16 +736,16 @@ const Dashboard = () => {
                       <TableCell sx={{ color: "#495057", fontWeight: 500 }}>{company.name}</TableCell>
                       <TableCell sx={{ color: "#6c757d" }}>{company.sector}</TableCell>
                       <TableCell align="right" sx={{ color: "#7cb342", fontWeight: 600 }}>
-                        ₹{company.stockPrice?.toFixed(2)}
+                        ₹{formatIndianCurrency(company.stockPrice?.toFixed(2))}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
-                        {company.availableShares?.toLocaleString()}
+                        {formatIndianCurrency(company.availableShares)}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
                         {company.esgScore?.toFixed(1)}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
-                        ₹{(company.stockPrice * company.availableShares)?.toLocaleString()}
+                        ₹{formatIndianCurrency((company.stockPrice * company.availableShares)?.toFixed(0))}
                       </TableCell>
                     </TableRow>
                   ))}

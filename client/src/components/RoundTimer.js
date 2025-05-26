@@ -80,17 +80,17 @@ const RoundTimer = () => {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2.5, sm: 3 },
-        mb: 3,
+        p: 1,
         backgroundColor: "transparent",
         background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-        border: "2px solid #16a34a",
-        borderRadius: "16px",
-        boxShadow: "0 8px 32px rgba(34, 197, 94, 0.2)",
+        border: "1px solid #16a34a",
+        borderRadius: "8px",
+        boxShadow: "0 2px 8px rgba(34, 197, 94, 0.2)",
         textAlign: "center",
         color: "white",
         position: "relative",
         overflow: "hidden",
+        minWidth: "80px",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -99,47 +99,37 @@ const RoundTimer = () => {
           right: 0,
           bottom: 0,
           background: "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
-          borderRadius: "14px",
+          borderRadius: "7px",
         },
       }}
     >
       <Typography
-        variant="h6"
+        variant="caption"
         sx={{
-          fontSize: { xs: "1rem", sm: "1.25rem" },
-          fontWeight: 600,
-          mb: 1,
+          fontSize: "0.65rem",
+          fontWeight: 500,
           opacity: 0.9,
           position: "relative",
           zIndex: 1,
+          lineHeight: 1,
         }}
       >
-        Current Round Active
+        Round Active
       </Typography>
       <Typography
-        variant="h4"
+        variant="h6"
         sx={{
-          fontSize: { xs: "1.75rem", sm: "2.25rem" },
+          fontSize: "1.1rem",
           fontWeight: "bold",
-          letterSpacing: "0.05em",
+          letterSpacing: "0.02em",
           position: "relative",
           zIndex: 1,
-          textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+          lineHeight: 1.2,
+          mt: 0.25,
         }}
       >
         {timeLeft.minutes.toString().padStart(2, "0")}:{timeLeft.seconds.toString().padStart(2, "0")}
-      </Typography>
-      <Typography
-        variant="body2"
-        sx={{
-          fontSize: { xs: "0.875rem", sm: "1rem" },
-          opacity: 0.8,
-          mt: 0.5,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        Time Remaining
       </Typography>
     </Paper>
   )
