@@ -457,7 +457,7 @@ const Dashboard = () => {
                           lineHeight: 1.2,
                         }}
                       >
-                        {formatIndianCurrency(portfolio?.normalizedValue?.toFixed(2))}
+                        {formatIndianCurrency(portfolio?.normalizedValue?.toFixed(2))} %
                       </Typography>
                     </Card>
                   </Grid>

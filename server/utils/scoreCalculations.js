@@ -36,13 +36,16 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
             totalSectorShares += holding.shares;
         }
     });
+const sectorCount = Object.keys(sectorDistribution).length;
+const maxEntropy = sectorCount > 1 ? Math.log(sectorCount) : 1;
 
-    const sectorScore = totalSectorShares > 0 
-        ? Object.values(sectorDistribution).reduce((score, shares) => {
-            const proportion = shares / totalSectorShares;
-            return score - (proportion * Math.log(proportion));
-        }, 0) * 100
-        : 0;
+const sectorScore = totalSectorShares > 0 && sectorCount > 0
+    ? Object.values(sectorDistribution).reduce((score, shares) => {
+        const proportion = shares / totalSectorShares;
+        return score - (proportion * Math.log(proportion));
+    }, 0) / maxEntropy * 100
+    : 0;
+   
 
     // Get max values for normalization
     const highestTeamValue = Math.max(...allUsers.map(u => u.portfolioValue || 0));
