@@ -2,7 +2,7 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
     // Calculate Average ESG Score
     let totalESGScore = 0;
     let totalShares = 0;
-    
+
     user.holdings.forEach(holding => {
         const company = companies.find(c => c._id.toString() === holding.company.toString());
         if (company) {
@@ -10,27 +10,25 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
             totalShares += holding.shares;
         }
     });
-    
+
     const avgESGScore = totalShares > 0 ? totalESGScore / totalShares : 0;
 
     // Calculate Portfolio Value
-    // Portfolio Value is the sum of cashBalance and the value of holdings
-    let portfolioValue = user.balance || 0; // Start with balance
+    let portfolioValue = user.balance || 0;
     user.holdings.forEach(holding => {
         const company = companies.find(c => c._id.toString() === holding.company.toString());
         if (company) {
-            portfolioValue += holding.shares * company.stockPrice; // Add value of holdings
+            portfolioValue += holding.shares * company.stockPrice;
         }
     });
 
-    // Calculate Normalized Value
-    const highestTeamValue = Math.max(...allUsers.map(u => u.portfolioValue || 0));
-    const normalizedValue = highestTeamValue > 0 ? (portfolioValue / highestTeamValue) * 100 : 0;
+    // Store portfolioValue in user object to use for normalization
+    user.portfolioValue = portfolioValue;
 
     // Calculate Sector Distribution Score
     const sectorDistribution = {};
     let totalSectorShares = 0;
-    
+
     user.holdings.forEach(holding => {
         const company = companies.find(c => c._id.toString() === holding.company.toString());
         if (company) {
@@ -39,7 +37,6 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
         }
     });
 
-    // Calculate sector diversity score (higher score for more diverse portfolio)
     const sectorScore = totalSectorShares > 0 
         ? Object.values(sectorDistribution).reduce((score, shares) => {
             const proportion = shares / totalSectorShares;
@@ -47,11 +44,21 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
         }, 0) * 100
         : 0;
 
-    // Calculate Final Score
+    // Get max values for normalization
+    const highestTeamValue = Math.max(...allUsers.map(u => u.portfolioValue || 0));
+    const maxESGScore = Math.max(...allUsers.map(u => u.avgESGScore || 0));
+    const maxSectorScore = Math.max(...allUsers.map(u => u.sectorScore || 0));
+
+    // Normalize values
+    const normalizedValue = highestTeamValue > 0 ? (portfolioValue / highestTeamValue) * 100 : 0;
+    const normalizedESG = maxESGScore > 0 ? (avgESGScore / maxESGScore) * 100 : 0;
+    const normalizedSectorScore = maxSectorScore > 0 ? (sectorScore / maxSectorScore) * 100 : 0;
+
+    // Final Score using normalized values
     const finalScore = (
-        (normalizedValue * 0.4) + // Portfolio Value Score
-        (avgESGScore * 0.4) +     // ESG Score
-        (sectorScore * 0.2)       // Sector Score
+        (normalizedValue * 0.4) +
+        (normalizedESG * 0.4) +
+        (normalizedSectorScore * 0.2)
     );
 
     return {
@@ -59,11 +66,12 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
         portfolioValue,
         normalizedValue,
         sectorScore,
+        normalizedESG,
+        normalizedSectorScore,
         finalScore,
         sectorDistribution
     };
 };
-
 module.exports = {
     calculatePortfolioMetrics
-}; 
+};

@@ -289,7 +289,7 @@ const Dashboard = () => {
             </Box>
             <CardContent sx={{ p: 0 }}>
               <Typography sx={{ color: "#6c757d", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
-                Total Holdings
+                Sector Score
               </Typography>
               <Typography
                 sx={{
@@ -300,10 +300,10 @@ const Dashboard = () => {
                   lineHeight: 1,
                 }}
               >
-                {portfolio?.holdings?.length || 0}
+                {portfolio?.sectorScore?.toFixed(0) || 0}%
               </Typography>
               <Typography sx={{ color: "#6c757d", fontSize: "0.75rem" }}>
-                Companies in portfolio
+                Portfolio diversification score
               </Typography>
             </CardContent>
           </Card>
