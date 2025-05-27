@@ -19,6 +19,14 @@ const companySchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    previousStockPrice: {
+        type: Number,
+        default: 0
+    },
+    reasonOfChange: {
+        type: String,
+        default: ''
+    },
     esgScore: {
         type: Number,
         required: true,

@@ -36,6 +36,7 @@ const Companies = () => {
     stockPrice: '',
     esgScore: '',
     availableShares: '',
+    reasonOfChange: ''
   });
 
   const fetchCompanies = async () => {
@@ -61,6 +62,7 @@ const Companies = () => {
         stockPrice: company.stockPrice || '',
         esgScore: company.esgScore || '',
         availableShares: company.availableShares || '',
+        reasonOfChange: company.reasonOfChange || ''
       });
     } else {
       setFormData({
@@ -70,6 +72,7 @@ const Companies = () => {
         stockPrice: '',
         esgScore: '',
         availableShares: '',
+        reasonOfChange: ''
       });
     }
     setIsModalVisible(true);
@@ -239,6 +242,16 @@ const Companies = () => {
                 required
                 fullWidth
                 inputProps={{ min: 0 }}
+              />
+              <TextField
+                name="reasonOfChange"
+                label="Reason of Change"
+                value={formData.reasonOfChange}
+                onChange={handleChange}
+                fullWidth
+                multiline
+                rows={2}
+                placeholder="Enter reason for stock price change (optional)"
               />
             </Box>
           </DialogContent>

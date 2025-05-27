@@ -57,7 +57,7 @@ router.post('/companies', async (req, res) => {
 // Update company
 router.put('/companies/:id', async (req, res) => {
   try {
-    const { name, sector, description, stockPrice, esgScore, availableShares } = req.body;
+    const { name, sector, description, stockPrice, esgScore, availableShares, reasonOfChange } = req.body;
 
     // Validate required fields
     if (!name || !sector || !description || !stockPrice || !esgScore || !availableShares) {
@@ -83,9 +83,21 @@ router.put('/companies/:id', async (req, res) => {
       }
     }
 
+    // Store previous stock price if it's being changed
+    const previousStockPrice = stockPrice !== company.stockPrice ? company.stockPrice : company.previousStockPrice;
+
     const updatedCompany = await Company.findByIdAndUpdate(
       req.params.id,
-      { name, sector, description, stockPrice, esgScore, availableShares },
+      { 
+        name, 
+        sector, 
+        description, 
+        stockPrice, 
+        esgScore, 
+        availableShares,
+        reasonOfChange,
+        previousStockPrice
+      },
       { new: true }
     );
     res.json(updatedCompany);

@@ -18,7 +18,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material"
-import { TrendingUp, RecycleIcon as Eco, BarChart3, Clock, DollarSign, PieChart, Building2 } from 'lucide-react'
+import { TrendingUp, RecycleIcon as Eco, BarChart3, Clock, DollarSign, PieChart, Building2, ArrowUp, ArrowDown } from 'lucide-react'
 import { getPortfolio, getCompanies } from "../services/api"
 import SocketService from "../services/socket"
 import RoundTimer from "../components/RoundTimer"
@@ -738,8 +738,38 @@ const Dashboard = () => {
                     <TableRow key={company._id} sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}>
                       <TableCell sx={{ color: "#495057", fontWeight: 500 }}>{company.name}</TableCell>
                       <TableCell sx={{ color: "#6c757d" }}>{company.sector}</TableCell>
-                      <TableCell align="right" sx={{ color: "#7cb342", fontWeight: 600 }}>
-                        ₹{formatIndianCurrency(company.stockPrice?.toFixed(2))}
+                      <TableCell align="right">
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography 
+                              sx={{ 
+                                color: company.stockPrice > company.previousStockPrice ? '#22c55e' : 
+                                      company.stockPrice < company.previousStockPrice ? '#ef4444' : '#7cb342',
+                                fontWeight: 600 
+                              }}
+                            >
+                              ₹{formatIndianCurrency(company.stockPrice?.toFixed(2))}
+                            </Typography>
+                            {company.stockPrice > company.previousStockPrice && (
+                              <ArrowUp size={16} color="#22c55e" />
+                            )}
+                            {company.stockPrice < company.previousStockPrice && (
+                              <ArrowDown size={16} color="#ef4444" />
+                            )}
+                          </Box>
+                          {company.reasonOfChange && (
+                            <Typography 
+                              sx={{ 
+                                color: '#6b7280',
+                                fontSize: '0.75rem',
+                                fontStyle: 'italic',
+                                mt: 0.5
+                              }}
+                            >
+                              {company.reasonOfChange}
+                            </Typography>
+                          )}
+                        </Box>
                       </TableCell>
                       <TableCell align="right" sx={{ color: "#495057" }}>
                         {formatIndianCurrency(company.availableShares)}
