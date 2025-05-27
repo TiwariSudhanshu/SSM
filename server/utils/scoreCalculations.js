@@ -6,7 +6,9 @@ const calculatePortfolioMetrics = (user, companies, allUsers) => {
     user.holdings.forEach(holding => {
         const company = companies.find(c => c._id.toString() === holding.company.toString());
         if (company) {
-            totalESGScore += holding.shares * company.esgScore;
+            // Convert ESG score to percentage (1-10 scale to 0-100 scale for calculations)
+            const esgPercentage = (company.esgScore / 10) * 100;
+            totalESGScore += holding.shares * esgPercentage;
             totalShares += holding.shares;
         }
     });

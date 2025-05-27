@@ -228,7 +228,7 @@ const Companies = () => {
                 onChange={handleChange}
                 required
                 fullWidth
-                inputProps={{ min: 0, max: 100 }}
+                inputProps={{ min: 1, max: 10, step: 0.1 }}
               />
               <TextField
                 name="availableShares"

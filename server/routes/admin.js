@@ -28,8 +28,8 @@ router.post('/companies', async (req, res) => {
     }
 
     // Validate ESG score
-    if (esgScore < 0 || esgScore > 100) {
-      return res.status(400).json({ message: 'ESG score must be between 0 and 100' });
+    if (esgScore < 1 || esgScore > 10) {
+      return res.status(400).json({ message: 'ESG score must be between 1 and 10' });
     }
 
     // Check if company with same name exists
@@ -65,8 +65,8 @@ router.put('/companies/:id', async (req, res) => {
     }
 
     // Validate ESG score
-    if (esgScore < 0 || esgScore > 100) {
-      return res.status(400).json({ message: 'ESG score must be between 0 and 100' });
+    if (esgScore < 1 || esgScore > 10) {
+      return res.status(400).json({ message: 'ESG score must be between 1 and 10' });
     }
 
     // Check if company exists

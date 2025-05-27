@@ -22,8 +22,8 @@ const companySchema = new mongoose.Schema({
     esgScore: {
         type: Number,
         required: true,
-        min: 0,
-        max: 100
+        min: 1,
+        max: 10
     },
     availableShares: {
         type: Number,
